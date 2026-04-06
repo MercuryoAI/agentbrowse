@@ -1,6 +1,6 @@
 {
   "name": "@mercuryo-ai/agentbrowse",
-  "version": "0.2.51",
+  "version": "0.2.52",
   "type": "module",
   "description": "Browser automation primitives library for AI agents",
   "license": "MIT",
