@@ -1,0 +1,79 @@
+{
+  "name": "@mercuryo-ai/agentbrowse",
+  "version": "0.2.50",
+  "type": "module",
+  "description": "Browser automation primitives library for AI agents",
+  "license": "MIT",
+  "keywords": [
+    "agentbrowse",
+    "browser",
+    "automation",
+    "ai-agent",
+    "browser-sdk",
+    "playwright",
+    "cdp"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MercuryoAI/agentbrowse.git"
+  },
+  "bugs": {
+    "url": "https://github.com/MercuryoAI/agentbrowse/issues"
+  },
+  "homepage": "https://github.com/MercuryoAI/agentbrowse#readme",
+  "main": "./dist/library.js",
+  "types": "./dist/library.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/library.d.ts",
+      "import": "./dist/library.js"
+    },
+    "./protected-fill": {
+      "types": "./dist/protected-fill.d.ts",
+      "import": "./dist/protected-fill.js"
+    },
+    "./testing": {
+      "types": "./dist/testing.d.ts",
+      "import": "./dist/testing.js"
+    }
+  },
+  "files": [
+    "dist",
+    "docs",
+    "examples",
+    "CHANGELOG.md",
+    "README.md"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "scripts": {
+    "build": "node -e \"require('node:fs').rmSync('dist',{ recursive: true, force: true })\" && tsc -p tsconfig.build.json",
+    "agentbrowse": "tsx src/index.ts",
+    "check-types": "tsc --noEmit",
+    "lint": "biome check src docs README.md",
+    "pack:verify": "node scripts/verify-pack-artifact.mjs",
+    "smoke:pack-install": "node scripts/verify-pack-install-smoke.mjs",
+    "prepack": "npm run build"
+  },
+  "dependencies": {
+    "@browserbasehq/stagehand": "^3.0.0",
+    "dotenv": "^16.4.0",
+    "playwright-core": "^1.58.2",
+    "puppeteer": "^23.11.1",
+    "puppeteer-extra": "^3.3.6",
+    "puppeteer-extra-plugin-stealth": "^2.11.2",
+    "snowball-stemmers": "^0.6.0",
+    "zod": "^3.24.0"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "1.9.4",
+    "@types/node": "^22.0.0",
+    "tsx": "^4.19.0",
+    "typescript": "5.9.2"
+  },
+  "packageManager": "pnpm@8.15.9+sha512.499434c9d8fdd1a2794ebf4552b3b25c0a633abcee5bb15e7b5de90f32f47b513aca98cd5cfd001c31f0db454bc3804edccd578501e4ca293a6816166bbd9f81"
+}

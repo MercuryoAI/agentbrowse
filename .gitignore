@@ -1,0 +1,14 @@
+node_modules/
+dist/
+coverage/
+playwright-report/
+test-results/
+tmp/
+*.tgz
+.env
+.env.*
+.npmrc
+npm-debug.log*
+.idea/
+.vscode/
+.DS_Store
