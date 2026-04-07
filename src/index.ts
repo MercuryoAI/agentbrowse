@@ -31,8 +31,8 @@ Options:
   --profile <name>                Solver profile name for launch (default: "default")
   --proxy [url]                   Launch through configured proxy, or use one-off override URL
   --provider <name>               Optional provider label for attach (for example "browserbase")
-  --headful                       Explicit alias for headful browser mode (default)
-  --headless                      Launch browser in headless mode
+  --headful                       Explicit alias for visible browser mode
+  --headless                      Explicit alias for headless browser mode (default)
   --path <file>                   Output path for screenshot
   --help                          Show this help message`;
 }
@@ -117,14 +117,14 @@ function parseLaunchArgs(args: string[]): {
   url?: string;
   compact: boolean;
   profile?: string;
-  headless: boolean;
+  headless?: boolean;
   useProxy: boolean;
   proxy?: string;
 } {
   let url: string | undefined;
   let compact = true;
   let profile: string | undefined;
-  let headless = false;
+  let headless: boolean | undefined;
   let useProxy = false;
   let proxy: string | undefined;
 
@@ -287,10 +287,10 @@ async function main(argv: string[] = process.argv): Promise<void> {
       deleteWorkflowContext();
       const launchResult = await launch(launchArgs.url, {
         compact: launchArgs.compact,
-        profile: launchArgs.profile,
-        headless: launchArgs.headless,
+        ...(launchArgs.profile ? { profile: launchArgs.profile } : {}),
+        ...(typeof launchArgs.headless === 'boolean' ? { headless: launchArgs.headless } : {}),
         useProxy: launchArgs.useProxy,
-        proxy: launchArgs.proxy,
+        ...(launchArgs.proxy ? { proxy: launchArgs.proxy } : {}),
       });
       if (launchResult.success) {
         saveBrowserSession(launchResult.session);

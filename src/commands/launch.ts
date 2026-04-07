@@ -104,7 +104,7 @@ async function launchManaged(
       info(`[launch] starting browser with proxy ${runtimeProxy.server}`);
     }
 
-    const resolvedHeadless = headless ?? config.defaults?.headless ?? false;
+    const resolvedHeadless = headless ?? config.defaults?.headless ?? true;
     session = await launchSolver(profile, {
       headless: resolvedHeadless,
       url,
