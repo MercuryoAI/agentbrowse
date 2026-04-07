@@ -1,4 +1,4 @@
-import { attach, observe } from '../src/library.ts';
+import { attach, observe } from '@mercuryo-ai/agentbrowse';
 
 const cdpUrl = process.env.AGENTBROWSE_CDP_URL;
 

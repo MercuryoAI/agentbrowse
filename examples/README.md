@@ -1,6 +1,15 @@
 # AgentBrowse Examples
 
-Run these examples from `packages/agentbrowse`:
+The published package includes these same files under `examples/`.
+
+If you run them from this repo, build once first so the self-referenced package
+entrypoint resolves to `dist/`:
+
+```bash
+npm run build
+```
+
+Then run the examples from `packages/agentbrowse`:
 
 ```bash
 npx tsx examples/basic.ts

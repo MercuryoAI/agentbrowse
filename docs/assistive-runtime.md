@@ -47,26 +47,11 @@ your adapter returns the expected response shape.
 import { createAgentbrowseClient } from '@mercuryo-ai/agentbrowse';
 
 const client = createAgentbrowseClient({
-  assistiveRuntime: {
-    createLlmClient: () => ({
-      async createChatCompletion(args) {
-        const { messages, response_model, image, temperature, maxOutputTokens } = args.options;
-
-        const json = await callStructuredProvider({
-          messages,
-          responseModel: response_model,
-          image,
-          temperature,
-          maxOutputTokens,
-        });
-
-        return {
-          data: json.data,
-          usage: json.usage,
-        };
-      },
-    }),
-  },
+  assistiveRuntime: createOpenAiCompatibleAssistiveRuntime({
+    baseUrl: 'https://api.openai.com/v1',
+    apiKey: process.env.OPENAI_API_KEY!,
+    model: 'gpt-4.1-mini',
+  }),
 });
 ```
 
@@ -81,27 +66,101 @@ This pattern works well when:
 You can wrap the adapter once and reuse it:
 
 ```ts
+import { toJsonSchema } from '@browserbasehq/stagehand';
+import type {
+  AgentbrowseAssistiveChatCompletionOptions,
+  AgentbrowseAssistiveLlmUsage,
+} from '@mercuryo-ai/agentbrowse';
+
+type StructuredChatResponse = {
+  choices?: Array<{
+    message?: {
+      content?: string;
+    };
+  }>;
+  usage?: AgentbrowseAssistiveLlmUsage;
+};
+
+function buildMessages(options: AgentbrowseAssistiveChatCompletionOptions) {
+  const messages = [...options.messages];
+  if (!options.image) {
+    return messages;
+  }
+
+  const content: Array<
+    | { type: 'text'; text: string }
+    | { type: 'image_url'; image_url: { url: string; detail: 'auto' } }
+  > = [];
+
+  if (options.image.description?.trim()) {
+    content.push({ type: 'text', text: options.image.description.trim() });
+  }
+
+  content.push({
+    type: 'image_url',
+    image_url: {
+      url: `data:image/jpeg;base64,${options.image.buffer.toString('base64')}`,
+      detail: 'auto',
+    },
+  });
+
+  messages.push({
+    role: 'user',
+    content,
+  });
+
+  return messages;
+}
+
 function createOpenAiCompatibleAssistiveRuntime(input: {
   baseUrl: string;
   apiKey: string;
+  model: string;
 }) {
+  const baseUrl = input.baseUrl.replace(/\/$/, '');
+
   return {
     createLlmClient: () => ({
-      async createChatCompletion(args) {
-        const { messages, response_model, image, temperature, maxOutputTokens } = args.options;
+      async createChatCompletion({ options }) {
+        if (!options.response_model) {
+          throw new Error('AgentBrowse assistive extract requires response_model.');
+        }
 
-        const json = await callStructuredProvider({
-          baseUrl: input.baseUrl,
-          apiKey: input.apiKey,
-          messages,
-          responseModel: response_model,
-          image,
-          temperature,
-          maxOutputTokens,
+        const response = await fetch(`${baseUrl}/chat/completions`, {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${input.apiKey}`,
+            Accept: 'application/json',
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            model: input.model,
+            messages: buildMessages(options),
+            response_format: {
+              type: 'json_schema',
+              json_schema: {
+                name: options.response_model.name,
+                strict: true,
+                schema: toJsonSchema(options.response_model.schema),
+              },
+            },
+            temperature: options.temperature,
+            max_completion_tokens: options.maxOutputTokens,
+          }),
         });
 
+        if (!response.ok) {
+          throw new Error(`assistive_provider_http_${response.status}`);
+        }
+
+        const json = (await response.json()) as StructuredChatResponse;
+        const content = json.choices?.[0]?.message?.content;
+        if (typeof content !== 'string' || content.trim().length === 0) {
+          throw new Error('assistive_provider_missing_content');
+        }
+
         return {
-          data: json.data,
+          data: JSON.parse(content),
           usage: json.usage,
         };
       },

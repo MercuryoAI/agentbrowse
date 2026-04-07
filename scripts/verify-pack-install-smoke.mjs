@@ -5,7 +5,11 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { linkWorkspacePackage, materializePackedPackage } from './pack-smoke-consumer.mjs';
+import {
+  linkWorkspacePackage,
+  materializePackedPackage,
+  resolveInstalledPackageDir,
+} from './pack-smoke-consumer.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const packageDir = path.join(__dirname, '..');
@@ -103,6 +107,7 @@ const requiredTestingExports = [
   'installFetchBackedTestAssistiveRuntime',
   'uninstallTestAssistiveRuntime',
 ];
+const publishedExampleFiles = ['basic.ts', 'attach.ts', 'extract.ts'];
 
 let tgzPath;
 let tempDir;
@@ -310,6 +315,22 @@ void documentedContractSmoke();
     packageName: '@mercuryo-ai/agentbrowse',
     tgzPath,
   });
+  const installedPackageDir = resolveInstalledPackageDir(consumerDir, '@mercuryo-ai/agentbrowse');
+  for (const exampleFile of publishedExampleFiles) {
+    const examplePath = path.join(installedPackageDir, 'examples', exampleFile);
+    if (!fs.existsSync(examplePath)) {
+      throw new Error(`packed artifact missing published example ${exampleFile}`);
+    }
+
+    const exampleSource = fs.readFileSync(examplePath, 'utf8');
+    if (!exampleSource.includes("from '@mercuryo-ai/agentbrowse'")) {
+      throw new Error(`published example ${exampleFile} does not import the public package entrypoint`);
+    }
+
+    if (exampleSource.includes('../src/library.ts')) {
+      throw new Error(`published example ${exampleFile} still imports ../src/library.ts`);
+    }
+  }
   for (const dependency of workspaceRuntimeDependencies) {
     logStep(`Linking workspace dependency ${dependency}.`);
     linkWorkspacePackage({

@@ -111,6 +111,7 @@ try {
 
 Runnable examples live in [`examples/`](./examples/README.md):
 
+- first run `npm run build` when executing them from this repo
 - `npx tsx examples/basic.ts`
 - `npx tsx examples/attach.ts`
 - `npx tsx examples/extract.ts`
@@ -201,29 +202,12 @@ The runtime contract is intentionally small: you provide an object that can
 create an OpenAI-compatible chat-completions client.
 
 ```ts
+// Pseudocode shape only. For a runnable fetch-based adapter, see
+// `examples/extract.ts` and `docs/assistive-runtime.md`.
 import { createAgentbrowseClient } from '@mercuryo-ai/agentbrowse';
 
 const client = createAgentbrowseClient({
-  assistiveRuntime: {
-    createLlmClient: () => ({
-      async createChatCompletion(args) {
-        const { messages, response_model, image, temperature, maxOutputTokens } = args.options;
-
-        const result = await callStructuredProvider({
-          messages,
-          responseModel: response_model,
-          image,
-          temperature,
-          maxOutputTokens,
-        });
-
-        return {
-          data: result.data,
-          usage: result.usage,
-        };
-      },
-    }),
-  },
+  assistiveRuntime: createMyFetchBackedRuntime(),
 });
 ```
 

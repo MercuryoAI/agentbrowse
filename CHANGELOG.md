@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- No unreleased changes yet.
+
+## 0.2.52
+
 - switched the library extraction API to `extract(session, schema, scopeRef?)`, where
   `schema` is a plain schema object or a Zod schema
 - made `observe(...)` return a top-level flat `targets` array alongside grouped

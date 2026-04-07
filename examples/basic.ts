@@ -1,4 +1,4 @@
-import { close, launch, observe, screenshot } from '../src/library.ts';
+import { close, launch, observe, screenshot } from '@mercuryo-ai/agentbrowse';
 
 const launchResult = await launch('https://example.com', {
   headless: false,
