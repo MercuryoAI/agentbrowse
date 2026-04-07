@@ -128,8 +128,6 @@ export async function close(session: BrowserSessionState | null): Promise<CloseR
         reason: closeResult.reason,
       };
     }
-
-    info(`Closed owned browser via ${closeResult.method}`);
   }
 
   recordCommandLifecycleEventBestEffort({
