@@ -1,21 +1,21 @@
 # @mercuryo-ai/agentbrowse
 
-Browser automation library for agent systems.
+[![npm version](https://img.shields.io/npm/v/@mercuryo-ai/agentbrowse)](https://www.npmjs.com/package/@mercuryo-ai/agentbrowse) [![MIT License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE) [![Node.js >= 18](https://img.shields.io/badge/node-%3E%3D18-brightgreen.svg)](https://nodejs.org)
 
-AgentBrowse is for the part of your system that has to work with a real web
-page.
+Give your AI agent a real browser.
 
-If your application already knows what it is trying to do, AgentBrowse gives
-you the browser layer for that work:
+AgentBrowse is the browser layer for agent systems that need to work with real
+web pages — launch a browser, read what's on screen, interact with it, and
+extract structured data. Your app keeps full control of orchestration and
+business logic; AgentBrowse handles the page.
 
-- launch a managed browser or attach to an existing CDP browser session;
-- inspect the current page;
-- interact with stable target references instead of raw selectors;
-- extract structured data from the page;
-- optionally use an LLM when page understanding needs help.
+Key capabilities:
 
-Your app keeps control of orchestration, state, policies, and business logic.
-AgentBrowse focuses on the page itself.
+- launch a managed browser or attach to an existing CDP session;
+- inspect the page and get stable target references (no raw selectors);
+- click, type, select, and fill through those references;
+- extract structured data with an optional LLM-backed runtime;
+- capture screenshots and check session health.
 
 A good first way to think about it is:
 
